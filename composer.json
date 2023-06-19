@@ -1,0 +1,49 @@
+{
+    "name": "pudongping/hyperf-throttle-requests",
+    "description": "A rate limiter implemented for Hyperf framework.",
+    "type": "library",
+    "license": "MIT",
+    "keywords": [
+        "php",
+        "hyperf",
+        "rate-limiter",
+        "throttle-requests",
+        "swoole"
+    ],
+    "autoload": {
+        "psr-4": {
+            "Pudongping\\HyperfThrottleRequests\\": "src/"
+        },
+        "files": [
+            "src/Functions.php"
+        ]
+    },
+    "authors": [
+        {
+            "name": "pudongping",
+            "email": "pudongping67@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.2",
+        "psr/container": "^1.0|^2.0",
+        "hyperf/utils": "~2.2.0",
+        "hyperf/redis": "~2.2.0",
+        "nesbot/carbon": "^2.0",
+        "psr/http-message": "^1.0",
+        "hyperf/http-server": "~2.2.0",
+        "hyperf/di": "~2.2.0"
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.2-dev"
+        },
+        "hyperf": {
+            "config": "Pudongping\\HyperfThrottleRequests\\ConfigProvider"
+        }
+    }
+}
