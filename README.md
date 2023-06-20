@@ -18,6 +18,8 @@ composer require pudongping/hyperf-throttle-requests -vvv
 
 ### 发布配置
 
+> 配置文件为非必需，注解参数均有默认值。
+
 在你自己的项目根目录下，执行以下命令
 
 ```shell

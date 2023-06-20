@@ -22,31 +22,31 @@ class ThrottleRequests extends AbstractAnnotation
     /**
      * @var int
      */
-    public $maxAttempts;
+    public $maxAttempts = 60;
 
     /**
      * @var int
      */
-    public $decaySeconds;
+    public $decaySeconds = 60;
 
     /**
      * @var string
      */
-    public $prefix;
+    public $prefix = '';
 
     /**
      * @var string
      */
-    public $key;
+    public $key = '';
 
     /**
      * @var null|callable
      */
-    public $generateKeyCallable;
+    public $generateKeyCallable = [];
 
     /**
      * @var null|callable
      */
-    public $tooManyAttemptsCallback;
+    public $tooManyAttemptsCallback = [];
 
 }
