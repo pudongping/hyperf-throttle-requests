@@ -4,9 +4,9 @@
 
 ## 运行环境
 
-- php >= 7.2
+- php >= 8.0
 - composer
-- hyperf ~2.2.0
+- hyperf ~3.0.0
 
 ## 安装
 
@@ -58,7 +58,7 @@ php bin/hyperf.php vendor:publish pudongping/hyperf-throttle-requests
  *
  * Created by PhpStorm
  * User: Alex
- * Date: 2023-06-18 23:50
+ * Date: 2023-06-21 11:36
  */
 declare(strict_types=1);
 
@@ -67,10 +67,8 @@ namespace App\Controller;
 use Hyperf\HttpServer\Annotation\AutoController;
 use Pudongping\HyperfThrottleRequests\Annotation\ThrottleRequests;
 
-/**
- * @AutoController(prefix="throttle-requests")
- * @ThrottleRequests()
- */
+#[AutoController(prefix: "throttle-requests")]
+#[ThrottleRequests]
 class ThrottleRequestsController
 {
 
@@ -107,10 +105,8 @@ namespace App\Controller;
 use Hyperf\HttpServer\Annotation\AutoController;
 use Pudongping\HyperfThrottleRequests\Annotation\ThrottleRequests;
 
-/**
- * @AutoController(prefix="throttle-requests")
- * @ThrottleRequests(key="test-throttle", maxAttempts=5, decaySeconds=15, prefix="TR:")
- */
+#[AutoController(prefix: "throttle-requests")]
+#[ThrottleRequests(key: "test-throttle", maxAttempts: 5, decaySeconds: 15, prefix: "TR:")]
 class ThrottleRequestsController
 {
 
@@ -146,17 +142,11 @@ namespace App\Controller;
 use Hyperf\HttpServer\Annotation\AutoController;
 use Pudongping\HyperfThrottleRequests\Annotation\ThrottleRequests;
 
-/**
- * @AutoController(prefix="throttle-requests")
- */
+#[AutoController(prefix: "throttle-requests")]
 class ThrottleRequestsController
 {
 
-    /**
-     * @ThrottleRequests(key="test-throttle", maxAttempts=5, decaySeconds=15, prefix="TR:")
-     *
-     * @return string[]
-     */
+    #[ThrottleRequests(key: "test-throttle", maxAttempts: 5, decaySeconds: 15, prefix: "TR:")]
     public function t1()
     {
         return [
@@ -164,11 +154,7 @@ class ThrottleRequestsController
         ];
     }
 
-    /**
-     * @ThrottleRequests(key="test-throttle", maxAttempts=5, decaySeconds=15, prefix="TR:")
-     *
-     * @return string[]
-     */
+    #[ThrottleRequests(key: "test-throttle", maxAttempts: 5, decaySeconds: 15, prefix: "TR:")]
     public function t2()
     {
         return [
@@ -180,7 +166,7 @@ class ThrottleRequestsController
 
 ```
 
-### 第二种：使用 `throttle_requests(string $rateLimits = '30,60', string $prefix = '', string $key = '', $generateKeyCallable = [], $tooManyAttemptsCallback = [])` 助手函数
+### 第二种：使用 `throttle_requests(string $rateLimits = '30,60', string $prefix = '', string $key = '', mixed $generateKeyCallable = [], mixed $tooManyAttemptsCallback = [])` 助手函数
 
 ```php
 
@@ -191,18 +177,13 @@ namespace App\Controller;
 
 use Hyperf\HttpServer\Annotation\AutoController;
 
-/**
- * @AutoController(prefix="throttle-requests")
- */
+#[AutoController(prefix: "throttle-requests")]
 class ThrottleRequestsController
 {
 
-    /**
-     * @return string[]
-     */
     public function t1()
     {
-        throttle_requests('5,15');
+        throttle_requests(rateLimits: "5,15");
         return [
             'name' => 'alex'
         ];
@@ -222,18 +203,13 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use Hyperf\HttpServer\Annotation\AutoController;
-use Hyperf\Utils\ApplicationContext;
 use Pudongping\HyperfThrottleRequests\Handler\ThrottleRequestsHandler;
+use Hyperf\Context\ApplicationContext;
 
-/**
- * @AutoController(prefix="throttle-requests")
- */
+#[AutoController(prefix: "throttle-requests")]
 class ThrottleRequestsController
 {
 
-    /**
-     * @return string[]
-     */
     public function t2()
     {
         ApplicationContext::getContainer()->get(ThrottleRequestsHandler::class)->handle(5, 15);
@@ -266,32 +242,22 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use Hyperf\HttpServer\Annotation\AutoController;
-use Pudongping\HyperfThrottleRequests\Annotation\ThrottleRequests;
-use Hyperf\Utils\ApplicationContext;
 use Pudongping\HyperfThrottleRequests\Handler\ThrottleRequestsHandler;
+use Hyperf\Context\ApplicationContext;
+use Pudongping\HyperfThrottleRequests\Annotation\ThrottleRequests;
 use App\Helper\ThrottleRequestsHelper;
 use Hyperf\HttpServer\Contract\RequestInterface;
 
-/**
- * @AutoController(prefix="throttle-requests")
- * @ThrottleRequests(generateKeyCallable={ThrottleRequestsHelper::class, "generateKeyCallable"})
- */
+#[AutoController(prefix: "throttle-requests")]
 class ThrottleRequestsController
 {
 
-    /**
-     * @var RequestInterface
-     */
-    protected $request;
-
-    public function __construct(RequestInterface $request)
+    public function __construct(protected RequestInterface $request)
     {
-        $this->request = $request;
+
     }
 
-    /**
-     * @return string[]
-     */
+    #[ThrottleRequests(generateKeyCallable: [ThrottleRequestsHelper::class, "generateKeyCallable"])]
     public function t1()
     {
         return [
@@ -299,22 +265,14 @@ class ThrottleRequestsController
         ];
     }
 
-    /**
-     * @return string[]
-     */
     public function t2()
     {
-        // 这里仅示例 `generateKeyCallable` 参数的实参方式，实际项目中
-        // 如果已经使用了 `Pudongping\HyperfThrottleRequests\Annotation\ThrottleRequests` 注解时
-        // 则不要再重复调用 `Pudongping\HyperfThrottleRequests\Handler\ThrottleRequestsHandler@handle()` 方法
         ApplicationContext::getContainer()
             ->get(ThrottleRequestsHandler::class)
             ->handle(
-                2,
+                5,
                 15,
-                '',
-                '',
-                [$this, 'generateKeyCallable']
+                generateKeyCallable: [$this, 'generateKeyCallable']
             );
 
         return [
@@ -346,23 +304,38 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use Hyperf\HttpServer\Annotation\AutoController;
+use Pudongping\HyperfThrottleRequests\Handler\ThrottleRequestsHandler;
+use Hyperf\Context\ApplicationContext;
 use Pudongping\HyperfThrottleRequests\Annotation\ThrottleRequests;
 use App\Helper\ThrottleRequestsHelper;
 
-/**
- * @AutoController(prefix="throttle-requests")
- * @ThrottleRequests(tooManyAttemptsCallback={ThrottleRequestsHelper::class, "tooManyAttemptsCallback"})
- */
+#[AutoController(prefix: "throttle-requests")]
 class ThrottleRequestsController
 {
 
-    /**
-     * @return string[]
-     */
+    #[ThrottleRequests(tooManyAttemptsCallback: [ThrottleRequestsHelper::class, 'tooManyAttemptsCallback'])]
     public function t1()
     {
         return [
             'name' => 'alex'
+        ];
+    }
+
+    public function t2()
+    {
+        ApplicationContext::getContainer()
+            ->get(ThrottleRequestsHandler::class)
+            ->handle(
+                5,
+                15,
+                tooManyAttemptsCallback: function () {
+                    var_dump('请求过于频繁');
+                    throw new \RuntimeException('请求过于频繁', 429);
+                }
+            );
+
+        return [
+            'name' => 'harry'
         ];
     }
 
@@ -380,19 +353,14 @@ declare(strict_types=1);
 namespace App\Helper;
 
 use Hyperf\HttpServer\Contract\RequestInterface;
-use Hyperf\Utils\ApplicationContext;
+use Hyperf\Context\ApplicationContext;
 
 class ThrottleRequestsHelper
 {
 
-    /**
-     * @var RequestInterface
-     */
-    protected $request;
-
-    public function __construct(RequestInterface $request)
+    public function __construct(protected RequestInterface $request)
     {
-        $this->request = $request;
+
     }
 
     public static function generateKeyCallable()

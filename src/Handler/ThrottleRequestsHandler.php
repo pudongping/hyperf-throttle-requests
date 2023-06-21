@@ -13,7 +13,7 @@ declare(strict_types=1);
 namespace Pudongping\HyperfThrottleRequests\Handler;
 
 use Carbon\Carbon;
-use Hyperf\Utils\Context;
+use Hyperf\Context\Context;
 use Psr\Http\Message\ResponseInterface;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Pudongping\HyperfThrottleRequests\Storage\StorageInterface;
@@ -22,26 +22,12 @@ use Pudongping\HyperfThrottleRequests\Exception\ThrottleRequestsException;
 class ThrottleRequestsHandler
 {
 
-    private $keyPrefix = 'throttle:';
-
-    private $keySuffix = ':timer';
-
-    /**
-     * @var RequestInterface
-     */
-    protected $request;
-
-    /**
-     * @var StorageInterface
-     */
-    protected $storage;
-
     public function __construct(
-        RequestInterface $request,
-        StorageInterface $storage
+        protected RequestInterface $request,
+        protected StorageInterface $storage,
+        private string             $keyPrefix = 'throttle:',
+        private string             $keySuffix = ':timer'
     ) {
-        $this->request = $request;
-        $this->storage = $storage;
     }
 
     /**
@@ -61,9 +47,9 @@ class ThrottleRequestsHandler
         int    $decaySeconds = 60,
         string $prefix = '',
         string $key = '',
-               $generateKeyCallable = [],
-               $tooManyAttemptsCallback = []
-    ) {
+        mixed  $generateKeyCallable = [],
+        mixed  $tooManyAttemptsCallback = []
+    ): void {
         $keyCounter = $this->keyPrefix($prefix) . $this->resolveRequestSignature($key, $generateKeyCallable);
 
         $maxAttempts = max(0, $maxAttempts);
@@ -149,7 +135,7 @@ class ThrottleRequestsHandler
      * @param mixed $generateKeyCallable
      * @return string
      */
-    private function resolveRequestSignature(string $key, $generateKeyCallable): string
+    private function resolveRequestSignature(string $key, mixed $generateKeyCallable): string
     {
         if ($key) return $key;
 
@@ -179,7 +165,7 @@ class ThrottleRequestsHandler
      * @return mixed
      * @throws ThrottleRequestsException
      */
-    protected function resolveTooManyAttempts(string $keyCounter, int $maxAttempts, $tooManyAttemptsCallback)
+    protected function resolveTooManyAttempts(string $keyCounter, int $maxAttempts, mixed $tooManyAttemptsCallback): mixed
     {
         if ($tooManyAttemptsCallback) {
             return call_user_func($tooManyAttemptsCallback);
@@ -212,8 +198,9 @@ class ThrottleRequestsHandler
      * @param string $keyCounter 计数器的 key
      * @param int $maxAttempts 在指定时间内允许的最大请求次数
      * @param int|null $retryAfter 距离下次重试请求需要等待的时间（s）
+     * @return void
      */
-    protected function setHeaders(string $keyCounter, int $maxAttempts, ?int $retryAfter = null)
+    protected function setHeaders(string $keyCounter, int $maxAttempts, ?int $retryAfter = null): void
     {
         // 设置返回头数据
         $headers = $this->getHeaders(
@@ -254,7 +241,7 @@ class ThrottleRequestsHandler
      * @param array $headers
      * @return void
      */
-    protected function addHeaders(array $headers = [])
+    protected function addHeaders(array $headers = []): void
     {
         $response = Context::get(ResponseInterface::class);
 

@@ -20,39 +20,36 @@ use Pudongping\HyperfThrottleRequests\Storage\StorageInterface;
 use Pudongping\HyperfThrottleRequests\Exception\InvalidArgumentException;
 use Pudongping\HyperfThrottleRequests\Handler\ThrottleRequestsHandler;
 use Pudongping\HyperfThrottleRequests\Annotation\ThrottleRequests;
-use function make;
+use function Hyperf\Support\make;
+use function Hyperf\Tappable\tap;
 
 class ThrottleRequestsAnnotationAspect extends AbstractAspect
 {
 
-    public $annotations = [
+    public array $annotations = [
         ThrottleRequests::class
     ];
 
-    /**
-     * @var array
-     */
-    private $annotationProperty;
+    private array $annotationProperty;
 
-    /**
-     * @var array
-     */
-    private $config;
-
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
+    private array $config;
 
     public function __construct(
-        ConfigInterface $config,
-        ContainerInterface $container
+        ConfigInterface              $config,
+        protected ContainerInterface $container
     ) {
         $this->annotationProperty = get_object_vars(new ThrottleRequests());
         $this->config = $this->parseConfig($config);
-        $this->container = $container;
     }
 
+    /**
+     * @param ProceedingJoinPoint $proceedingJoinPoint
+     * @return mixed
+     * @throws InvalidArgumentException
+     * @throws \Hyperf\Di\Exception\Exception
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
+     */
     public function process(ProceedingJoinPoint $proceedingJoinPoint)
     {
         $annotation = $this->getWeightingAnnotation($this->getAnnotations($proceedingJoinPoint));
@@ -92,7 +89,11 @@ class ThrottleRequestsAnnotationAspect extends AbstractAspect
             $property = array_merge($property, array_filter(get_object_vars($annotation)));
         }
 
-        return new ThrottleRequests($property);
+        return tap(new ThrottleRequests(), static function (ThrottleRequests $throttleRequests) use ($property) {
+            foreach ($property as $k => $v) {
+                $throttleRequests->{$k} = $v;
+            }
+        });
     }
 
     /**

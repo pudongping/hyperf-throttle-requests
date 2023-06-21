@@ -8,7 +8,7 @@
  */
 declare(strict_types=1);
 
-use Hyperf\Utils\ApplicationContext;
+use Hyperf\Context\ApplicationContext;
 use Pudongping\HyperfThrottleRequests\Handler\ThrottleRequestsHandler;
 
 if (! function_exists('throttle_requests')) {
@@ -31,9 +31,9 @@ if (! function_exists('throttle_requests')) {
         string $rateLimits = '30,60',
         string $prefix = '',
         string $key = '',
-        $generateKeyCallable = [],
-        $tooManyAttemptsCallback = []
-    ) {
+        mixed $generateKeyCallable = [],
+        mixed $tooManyAttemptsCallback = []
+    ): void {
         if (! ApplicationContext::hasContainer()) {
             throw new \RuntimeException('The application context lacks the container.');
         }

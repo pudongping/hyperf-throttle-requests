@@ -17,10 +17,10 @@ interface StorageInterface
      * Fetches a value from the cache.
      *
      * @param string $key
-     * @param $default
+     * @param mixed|null $default
      * @return mixed
      */
-    public function get(string $key, $default = null);
+    public function get(string $key, mixed $default = null): mixed;
 
     /**
      * Store an item in the cache.

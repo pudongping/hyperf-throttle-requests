@@ -23,13 +23,6 @@ class ConfigProvider
             'dependencies' => [
                 StorageInterface::class => RedisStorage::class
             ],
-            'annotations' => [
-                'scan' => [
-                    'paths' => [
-                        __DIR__,
-                    ],
-                ],
-            ],
             'commands' => [],
             'listeners' => [],
             'aspects' => [

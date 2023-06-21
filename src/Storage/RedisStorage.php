@@ -26,7 +26,7 @@ class RedisStorage implements StorageInterface
         $this->redis = $container->get(Redis::class);
     }
 
-    public function get(string $key, $default = null)
+    public function get(string $key, mixed $default = null): mixed
     {
         $value = $this->redis->get($key);
 
@@ -75,14 +75,10 @@ class RedisStorage implements StorageInterface
         $iterator = null;
         $key = $prefix . '*';
 
-        while (true) {
+        while ($iterator !== 0) {
             $keys = $this->redis->scan($iterator, $key, 10000);
-            if (! empty($keys)) {
+            if ($keys) {
                 $this->redis->del(...$keys);
-            }
-
-            if (empty($iterator)) {
-                break;
             }
         }
 

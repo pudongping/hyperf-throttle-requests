@@ -10,43 +10,21 @@ declare(strict_types=1);
 
 namespace Pudongping\HyperfThrottleRequests\Annotation;
 
+use Attribute;
 use Hyperf\Di\Annotation\AbstractAnnotation;
 
-/**
- * @Annotation
- * @Target({"CLASS", "METHOD"})
- */
+#[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_METHOD)]
 class ThrottleRequests extends AbstractAnnotation
 {
 
-    /**
-     * @var int
-     */
-    public $maxAttempts;
-
-    /**
-     * @var int
-     */
-    public $decaySeconds;
-
-    /**
-     * @var string
-     */
-    public $prefix;
-
-    /**
-     * @var string
-     */
-    public $key;
-
-    /**
-     * @var null|callable
-     */
-    public $generateKeyCallable;
-
-    /**
-     * @var null|callable
-     */
-    public $tooManyAttemptsCallback;
+    public function __construct(
+        public ?int    $maxAttempts = null,
+        public ?int    $decaySeconds = null,
+        public ?string $prefix = null,
+        public ?string $key = null,
+        public mixed   $generateKeyCallable = null,
+        public mixed   $tooManyAttemptsCallback = null
+    ) {
+    }
 
 }
