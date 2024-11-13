@@ -4,14 +4,28 @@
 
 ## 运行环境
 
-- php >= 8.0
+- php >= 8.1
 - composer
-- hyperf ~3.0.0
+- hyperf ~3.1.0
+
+## 分支或者标签
+
+### 分支
+
+- **2.2:** For hyperf 2.2
+- **3.0:** For hyperf ~3.0
+- **3.1:** For hyperf ~3.1
+
+### 标签
+
+- **1.0.x:** For hyperf 2.2
+- **2.0.x:** For hyperf 3.0
+- **3.0.x:** For hyperf 3.1
 
 ## 安装
 
 ```shell
-composer require pudongping/hyperf-throttle-requests -vvv
+composer require pudongping/hyperf-throttle-requests:^3.0 -vvv
 ```
 
 ## 配置
